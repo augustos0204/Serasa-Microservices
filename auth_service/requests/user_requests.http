@@ -1,0 +1,77 @@
+### Auth Service - User Management Endpoints
+### Base URL: http://localhost:8003
+
+### 1. Create User
+POST http://localhost:8003/users/
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "securepassword123",
+  "full_name": "John Doe"
+}
+
+### 2. Get User by ID
+GET http://localhost:8003/users/id
+Authorization: Bearer
+
+### 3. Get All Users
+GET http://localhost:8003/users/?skip=0&limit=10
+Authorization: Bearer
+
+### 4. Get User by Email
+GET http://localhost:8003/users/?email=example@mail.com
+Authorization: Bearer
+
+### 5. Update User
+PATCH http://localhost:8003/users/id
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "full_name": "John Smith"
+}
+
+### 6. Update User Password
+PATCH http://localhost:8003/users/1
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "password": "newsecurepassword456"
+}
+
+### 7. Update User Email and Name
+PATCH http://localhost:8003/users/1
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "email": "john.smith@example.com",
+  "full_name": "John Smith Jr."
+}
+
+### 8. Delete User
+DELETE http://localhost:8003/users/1
+Authorization: Bearer
+
+### Create Additional Users for Testing
+POST http://localhost:8003/users/
+Content-Type: application/json
+
+{
+  "email": "jane.doe@example.com",
+  "password": "password123",
+  "full_name": "Jane Doe"
+}
+
+###
+POST http://localhost:8003/users/
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123",
+  "full_name": "System Admin"
+}
+

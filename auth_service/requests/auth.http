@@ -1,0 +1,19 @@
+### Auth Service - Authentication Endpoints
+### Base URL: http://localhost:8003
+
+### User Login
+POST http://localhost:8003/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "securepassword123"
+}
+
+### Validate Token
+GET http://localhost:8003/auth/validate
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Get Current User Data
+GET http://localhost:8003/auth/me
+Authorization: Bearer YOUR_JWT_TOKEN_HERE

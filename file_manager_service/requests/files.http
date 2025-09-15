@@ -1,0 +1,29 @@
+### Upload File
+POST http://localhost:8001/files/
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="file"; filename="sample.csv"
+Content-Type: text/csv
+
+id,name,email
+1,João Silva,joao@email.com
+2,Maria Santos,maria@email.com
+------WebKitFormBoundary--
+
+### List User Files
+GET http://localhost:8001/files/
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### List User Files with Pagination
+GET http://localhost:8001/files/?skip=0&limit=10
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Get File Metadata
+GET http://localhost:8001/files/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Delete File
+DELETE http://localhost:8001/files/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE

@@ -1,0 +1,131 @@
+# === Python ===
+# Virtual environments (todos os microserviços)
+.venv/
+venv/
+env/
+ENV/
+*/venv/
+*/.venv/
+*/env/
+*/ENV/
+
+# Python cache e bytecode
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Build artifacts
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# === Environment files (CRÍTICO - contém credenciais) ===
+.env
+.env.*
+*.env
+.env.local
+.env.production
+.env.development
+.env.test
+# Específico para cada microserviço
+auth_service/.env
+file_manager_service/.env
+data_processor_service/.env
+
+# === Database ===
+postgres_data/
+postgresql_data/
+
+# === Logs ===
+*.log
+logs/
+log/
+
+# === File uploads & processing (dados de usuários) ===
+files/
+*/files/
+file_manager_service/files/
+uploads/
+*/uploads/
+temp/
+*/temp/
+processed/
+*/processed/
+failed/
+*/failed/
+original/
+*/original/
+
+# === IDE & Editors ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# === Docker ===
+docker-compose.override.yml
+.dockerignore
+
+# === Testing ===
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# === Jupyter Notebooks ===
+.ipynb_checkpoints
+
+# === mypy ===
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# === Temporary files ===
+*.tmp
+*.temp
+test_*.py
+debug_*.py
+temp_*
+tmp_*
+
+# === Microservices específicos ===
+# Alembic cache
+**/alembic/__pycache__/
+**/alembic/versions/__pycache__/
+
+# Service-specific caches
+auth_service/__pycache__/
+auth_service/**/__pycache__/
+file_manager_service/__pycache__/
+file_manager_service/**/__pycache__/
+data_processor_service/__pycache__/
+data_processor_service/**/__pycache__/
+
+# === OS generated files ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

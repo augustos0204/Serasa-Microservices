@@ -1,0 +1,110 @@
+services:
+  # Base de dados PostgreSQL com init.sql
+  postgres:
+    image: postgres:15
+    container_name: etl_postgres_dev
+    environment:
+      POSTGRES_DB: etl_database
+      POSTGRES_USER: etl_user
+      POSTGRES_PASSWORD: etl_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./scripts/init.sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - etl_network_dev
+
+  # Fila RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: etl_rabbitmq_dev
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"     # AMQP port
+      - "15672:15672"   # Management UI
+    volumes:
+      - rabbitmq_data_dev:/var/lib/rabbitmq
+    networks:
+      - etl_network_dev
+
+  # Auth Service (Desenvolvimento - Porta exposta)
+  auth-service:
+    build:
+      context: ./auth_service
+      dockerfile: Dockerfile
+    container_name: etl_auth_dev
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
+      - PORT=8003
+    env_file:
+      - ./auth_service/.env
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./auth_service:/app
+    depends_on:
+      - postgres
+    networks:
+      - etl_network_dev
+    restart: unless-stopped
+
+  # File Manager Service (Desenvolvimento - Porta exposta)
+  file-manager-service:
+    build:
+      context: ./file_manager_service
+      dockerfile: Dockerfile
+    container_name: etl_file_manager_dev
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
+      - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
+      - AUTH_SERVICE_URL=http://auth-service:8003
+      - PORT=8001
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./file_manager_service:/app
+      - file_uploads_dev:/app/files
+    depends_on:
+      - postgres
+      - rabbitmq
+      - auth-service
+    networks:
+      - etl_network_dev
+    restart: unless-stopped
+
+  # Data Processor Service (Desenvolvimento - Porta exposta)
+  data-processor-service:
+    build:
+      context: ./data_processor_service
+      dockerfile: Dockerfile
+    container_name: etl_data_processor_dev
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
+      - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
+      - FILE_MANAGER_SERVICE_URL=http://file-manager-service:8001
+      - PORT=8002
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./data_processor_service:/app
+      - file_uploads_dev:/app/files
+    depends_on:
+      - postgres
+      - rabbitmq
+      - file-manager-service
+    networks:
+      - etl_network_dev
+    restart: unless-stopped
+
+volumes:
+  postgres_data_dev:
+  rabbitmq_data_dev:
+  file_uploads_dev:
+    driver: local
+
+networks:
+  etl_network_dev:
+    driver: bridge

@@ -1,0 +1,117 @@
+services:
+  # Base de dados PostgreSQL
+  postgres:
+    image: postgres:15
+    container_name: etl_postgres
+    environment:
+      POSTGRES_DB: etl_database
+      POSTGRES_USER: etl_user
+      POSTGRES_PASSWORD: etl_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - etl_network
+
+  # Fila RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: etl_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"     # AMQP port
+      - "15672:15672"   # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - etl_network
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: etl_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth-service
+      - file-manager-service
+      - data-processor-service
+    networks:
+      - etl_network
+    restart: unless-stopped
+
+  # Auth Service (Scalable)
+  auth-service:
+    build:
+      context: ./auth_service
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
+      - PORT=8003
+    env_file:
+      - ./auth_service/.env
+    volumes:
+      - ./auth_service:/app
+    depends_on:
+      - postgres
+    networks:
+      - etl_network
+    restart: unless-stopped
+
+  # File Manager Service (Scalable)
+  file-manager-service:
+    build:
+      context: ./file_manager_service
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
+      - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
+      - AUTH_SERVICE_URL=http://auth-service:8003
+      - PORT=8001
+    volumes:
+      - ./file_manager_service:/app
+      - file_uploads:/app/files
+    depends_on:
+      - postgres
+      - rabbitmq
+      - auth-service
+    networks:
+      - etl_network
+    restart: unless-stopped
+
+  # Data Processor Service (Scalable)
+  data-processor-service:
+    build:
+      context: ./data_processor_service
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
+      - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
+      - FILE_MANAGER_SERVICE_URL=http://file-manager-service:8001
+      - PORT=8002
+    volumes:
+      - ./data_processor_service:/app
+      - file_uploads:/app/files
+    depends_on:
+      - postgres
+      - rabbitmq
+      - file-manager-service
+    networks:
+      - etl_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  file_uploads:
+    driver: local
+
+networks:
+  etl_network:
+    driver: bridge

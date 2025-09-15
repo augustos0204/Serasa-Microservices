@@ -1,0 +1,54 @@
+### File Inconsistencies API Requests
+### Data Processor Service - Port 8002
+
+### Variables
+@baseUrl = http://localhost:8002
+@token = {{auth_token}}
+
+### Get all file inconsistencies (with pagination)
+GET {{baseUrl}}/file-inconsistencies/
+Authorization: Bearer {{token}}
+
+### Get file inconsistencies with filters
+GET {{baseUrl}}/file-inconsistencies/?file_id=1&limit=50&offset=0
+Authorization: Bearer {{token}}
+
+### Get file inconsistencies by error type
+GET {{baseUrl}}/file-inconsistencies/?error_type=data_validation&limit=100
+Authorization: Bearer {{token}}
+
+### Get file inconsistencies for specific line
+GET {{baseUrl}}/file-inconsistencies/?file_id=1&line_number=5
+Authorization: Bearer {{token}}
+
+### Get inconsistencies for specific file
+GET {{baseUrl}}/file-inconsistencies/1
+Authorization: Bearer {{token}}
+
+### Get inconsistencies for specific file with filters
+GET {{baseUrl}}/file-inconsistencies/1?error_type=missing_columns
+Authorization: Bearer {{token}}
+
+### Get inconsistencies for specific file and line
+GET {{baseUrl}}/file-inconsistencies/1?line_number=10&limit=20
+Authorization: Bearer {{token}}
+
+### Get file inconsistencies summary
+GET {{baseUrl}}/file-inconsistencies/summary/1
+Authorization: Bearer {{token}}
+
+### Get summary for file that may not exist
+GET {{baseUrl}}/file-inconsistencies/summary/999
+Authorization: Bearer {{token}}
+
+### Test pagination
+GET {{baseUrl}}/file-inconsistencies/?limit=10&offset=20
+Authorization: Bearer {{token}}
+
+### Test invalid error type (should return 400)
+GET {{baseUrl}}/file-inconsistencies/?error_type=invalid_type
+Authorization: Bearer {{token}}
+
+### Test large limit (should be capped at 1000)
+GET {{baseUrl}}/file-inconsistencies/?limit=2000
+Authorization: Bearer {{token}}

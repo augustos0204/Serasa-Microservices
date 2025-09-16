@@ -16,8 +16,8 @@ class FileUploadService:
         user: UserData
     ) -> FileMetadata:
         try:
-            upload_dir = os.getenv("UPLOAD_DIR", "./files")
-            upload_dir_abs = Path(upload_dir).resolve()
+            upload_dir = os.getenv("UPLOAD_DIR", "/app/files")
+            upload_dir_abs = Path(upload_dir)
 
             file_id = str(uuid.uuid4())
             file_extension = Path(file.filename).suffix if file.filename else ""

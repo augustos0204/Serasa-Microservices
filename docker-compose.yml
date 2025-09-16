@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./scripts/init.sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     networks:
       - etl_network
 
@@ -94,6 +94,7 @@ services:
       - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
       - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
       - FILE_MANAGER_SERVICE_URL=http://file-manager-service:8001
+      - AUTH_SERVICE_URL=http://auth-service:8003
       - PORT=8002
     volumes:
       - ./data_processor_service:/app
@@ -101,6 +102,7 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+      - auth-service
       - file-manager-service
     networks:
       - etl_network

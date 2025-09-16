@@ -61,12 +61,13 @@ services:
       - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
       - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
       - AUTH_SERVICE_URL=http://auth-service:8003
+      - UPLOAD_DIR=/app/files
       - PORT=8001
     ports:
       - "8001:8001"
     volumes:
       - ./file_manager_service:/app
-      - file_uploads_dev:/app/files
+      - ./files:/app/files
     depends_on:
       - postgres
       - rabbitmq
@@ -85,15 +86,17 @@ services:
       - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
       - RABBITMQ_URL=amqp://admin:admin123@rabbitmq:5672/
       - FILE_MANAGER_SERVICE_URL=http://file-manager-service:8001
+      - AUTH_SERVICE_URL=http://auth-service:8003
       - PORT=8002
     ports:
       - "8002:8002"
     volumes:
       - ./data_processor_service:/app
-      - file_uploads_dev:/app/files
+      - ./files:/app/files
     depends_on:
       - postgres
       - rabbitmq
+      - auth-service
       - file-manager-service
     networks:
       - etl_network_dev
@@ -102,8 +105,6 @@ services:
 volumes:
   postgres_data_dev:
   rabbitmq_data_dev:
-  file_uploads_dev:
-    driver: local
 
 networks:
   etl_network_dev:

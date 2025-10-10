@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,8 +22,6 @@ async def upload_file(
 ):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
-
-    import os
     allowed_extensions_str = os.getenv("ALLOWED_FILE_EXTENSIONS", ".csv,.txt,.json,.xlsx,.xls")
     allowed_extensions = [ext.strip() for ext in allowed_extensions_str.split(",")]
 

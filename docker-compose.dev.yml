@@ -39,8 +39,8 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://etl_user:etl_password@postgres:5432/etl_database
       - PORT=8003
-    env_file:
-      - ./auth_service/.env
+    # env_file:
+      # - ./auth_service/.env
     ports:
       - "8003:8003"
     volumes:
